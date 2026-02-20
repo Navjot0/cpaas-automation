@@ -311,19 +311,21 @@ public class CreateCampaignPage {
     }
 
 
+
     public void selectScheduleForLater() {
 
-        By scheduleRadio = By.id("schedule_later"); // 🔴 check actual id in DOM
+        By scheduleCard = By.xpath("//label[contains(.,'Schedule for Later')]");
 
-        WebElement radio = wait.waitForClickable(scheduleRadio);
+        wait.waitForClickable(scheduleCard);
+        driver.findElement(scheduleCard).click();
 
-        ((JavascriptExecutor) driver)
-                .executeScript("arguments[0].click();", radio);
+        // 🔥 IMPORTANT: Wait for date-time picker section to appear
+        By dateInput = By.xpath("//input[@type='datetime-local' or @type='date']");
 
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeSelected(scheduleRadio));
+        new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.visibilityOfElementLocated(dateInput));
 
-        System.out.println("✅ Schedule for Later selected");
+        System.out.println("✅ Schedule for Later selected and date section visible");
     }
 
     public void waitForTemplateVariablesToLoad() {
@@ -359,7 +361,7 @@ public class CreateCampaignPage {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         // IMPORTANT: type="date" requires yyyy-MM-dd format
-        String formattedDate = tomorrow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String formattedDate = tomorrow.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         // 3️⃣ Set date directly
         dateInput.clear();
