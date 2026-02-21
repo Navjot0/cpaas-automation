@@ -275,6 +275,7 @@ public class CreateCampaignPage {
                 By.xpath("//input[starts-with(@id,'columnMapping.')]")
         );
 
+
         if (variableInputs.isEmpty()) {
             System.out.println("ℹ No template variables required.");
             return;

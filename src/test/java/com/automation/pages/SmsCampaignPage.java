@@ -11,6 +11,7 @@ public class SmsCampaignPage {
         this.driver = driver;
     }
 
+
     private By createNewCampaignBtn =
             By.xpath("//button[contains(text(),'Create New Campaign')]");
 

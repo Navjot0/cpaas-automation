@@ -147,6 +147,7 @@ public class SmsCampaignTest extends BaseTest {
         createSmsCampaign(true, false, false, true);
     }
 
+
     @Test(priority = 8)
     public void test_CsvImport_DuplicateOff_NonVariable_Schedule() {
         // Test CSV import with duplicates removed, non-variable template, schedule
