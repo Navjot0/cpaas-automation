@@ -328,24 +328,6 @@ public class CreateCampaignPage {
         System.out.println("✅ Schedule for Later selected and date section visible");
     }
 
-    public void waitForTemplateVariablesToLoad() {
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-
-        // 1️⃣ Wait for skeleton loader to disappear
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(
-                By.xpath("//div[contains(@class,'animate-pulse')]")
-        ));
-
-        // 2️⃣ Wait for at least one variable input field
-        By variableField = By.xpath(
-                "//input[contains(@wire:model,'columnMapping')]"
-        );
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(variableField));
-
-        System.out.println("✅ Template variable inputs loaded");
-    }
 
     public void scheduleForNextDayAtNoon() {
 
