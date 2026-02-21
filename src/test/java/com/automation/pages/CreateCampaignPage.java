@@ -529,4 +529,15 @@ public class CreateCampaignPage {
     }
 
 
+    public void enterTemplateVariableValue(int keyNumber, String value) {
+
+        By inputField = By.id("columnMapping." + keyNumber);
+
+        wait.waitForElementVisible(inputField).clear();
+        wait.waitForElementVisible(inputField).sendKeys(value);
+
+        System.out.println("✅ Entered value '" + value + "' for Key " + keyNumber);
+    }
+
+
 }

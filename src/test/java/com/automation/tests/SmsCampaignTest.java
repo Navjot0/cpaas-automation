@@ -2,6 +2,7 @@ package com.automation.tests;
 
 import com.automation.base.BaseTest;
 import com.automation.pages.*;
+import com.automation.utils.WaitUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -76,7 +77,10 @@ public class SmsCampaignTest extends BaseTest {
         // 3️⃣ Select Template
         if (variableTemplate) {
             create.selectTemplate("var2temp");
-            create.autoFillTemplateVariablesIfPresent();
+            create.enterTemplateVariableValue(1, "Name");
+            WaitUtils.sleep(4);
+            create.enterTemplateVariableValue(2, "Address");
+//            create.autoFillTemplateVariablesIfPresent();
         } else {
             create.selectTemplate("sample_test");
         }

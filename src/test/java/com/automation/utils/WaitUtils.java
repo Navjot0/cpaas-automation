@@ -46,6 +46,20 @@ public class WaitUtils {
                 .until(condition);
     }
 
+    public WebElement waitForElementClickable(By locator) {
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
+    }
 
+    public WebElement waitForElementVisible(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    public static void sleep(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
