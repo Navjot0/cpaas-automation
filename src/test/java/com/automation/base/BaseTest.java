@@ -13,6 +13,7 @@ import java.time.Duration;
 public class BaseTest {
 
     protected WebDriver driver;
+    protected String baseUrl = "https://testqa.gtsstaging.com";
 
     // 🔐 Runs ONCE before all test methods in class
     @BeforeClass
@@ -24,14 +25,15 @@ public class BaseTest {
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 
-        driver.get("https://testqa.gtsstaging.com/login");
+        // Open login page
+        driver.get(baseUrl + "/login");
 
-        // ✅ Login only once
+        // ✅ Login only once per test class
         LoginPage login = new LoginPage(driver);
         login.login("Kanchan.shinde@globeteleservices.com", "Testqa@123");
     }
 
-    // 📸 Runs after EACH test method (for screenshot)
+    // 📸 Runs after EACH test method (for screenshot if failed)
     @AfterMethod
     public void captureFailure(ITestResult result) {
 
@@ -49,5 +51,15 @@ public class BaseTest {
         }
     }
 
+    // ===============================
+    // 🔁 Navigation Helpers
+    // ===============================
 
+    protected void navigateToCampaignPage() {
+        driver.get(baseUrl + "/campaign/sms");
+    }
+
+    protected void navigateToSenderIdPage() {
+        driver.get(baseUrl + "/channels/sms/senderid");
+    }
 }
