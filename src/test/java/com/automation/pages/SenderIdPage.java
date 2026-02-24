@@ -1,12 +1,15 @@
 package com.automation.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Random;
 
@@ -31,6 +34,7 @@ public class SenderIdPage {
     private By typeDropdown = By.id("type");
     private By entityIdInput = By.id("entity_id");
     private By submitButton = By.xpath("//button[@type='submit' and contains(.,'Save Sender ID')]");
+
 
     private By successToast = By.xpath("//*[contains(text(),'success') or contains(@class,'toast')]");
 
@@ -188,5 +192,147 @@ public class SenderIdPage {
     public void selectTypeOTP() {
         new Select(wait.until(ExpectedConditions.elementToBeClickable(typeDropdown)))
                 .selectByVisibleText("OTP");
+    }
+
+    // ========== LOCATORS ==========
+
+    private By uploadButton = By.xpath("//button[contains(@onclick,'sms.senderid.fetch')]");
+    private By fileInput = By.id("dropzone-file");
+    private By yesImportButton = By.xpath("//button[contains(.,'Yes, Import')]");
+
+
+    // Optional: success toast
+    private By successMessage = By.xpath("//*[contains(text(),'success') or contains(text(),'Imported')]");
+
+// ========== METHODS ==========
+
+    public void clickUploadSenderId() {
+
+        WebElement btn = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//button[contains(@onclick,'sms.senderid.fetch')]")
+                )
+        );
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[@role='dialog']")
+        ));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.id("dropzone-file")
+        ));
+    }
+
+    public void uploadCsvFile(String filePath) {
+        WebElement uploadElement = wait.until(ExpectedConditions.presenceOfElementLocated(fileInput));
+        uploadElement.sendKeys(filePath);
+    }
+
+    public void clickYesImport() {
+        wait.until(ExpectedConditions.elementToBeClickable(yesImportButton)).click();
+    }
+
+    public boolean isImportSuccessful() {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void uploadSenderIdFromCsv() {
+
+        WebDriverWait waitCustom = new WebDriverWait(driver, Duration.ofSeconds(40));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        // ===============================
+        // 📂 CSV Path
+        // ===============================
+        String filePath = Paths.get(
+                "src",
+                "test",
+                "testdata",
+                "sender_id_sample.csv"
+        ).toAbsolutePath().toString();
+
+        File file = new File(filePath);
+
+        if (!file.exists()) {
+            throw new RuntimeException("❌ CSV file not found at: " + filePath);
+        }
+
+        System.out.println("📂 Using CSV file: " + filePath);
+
+        // ===============================
+        // 1️⃣ Click Upload Button
+        // ===============================
+        By uploadBtn = By.xpath("//button[contains(.,'Upload') and contains(.,'Sender')]");
+
+        waitCustom.until(ExpectedConditions.elementToBeClickable(uploadBtn)).click();
+
+        // ===============================
+        // 2️⃣ Wait For Modal
+        // ===============================
+        By modalLocator = By.xpath("//div[contains(@class,'fixed')]");
+        waitCustom.until(ExpectedConditions.visibilityOfElementLocated(modalLocator));
+
+        // ===============================
+        // 3️⃣ Upload File
+        // ===============================
+        By fileInput = By.id("dropzone-file");
+
+        WebElement upload = waitCustom.until(
+                ExpectedConditions.presenceOfElementLocated(fileInput)
+        );
+
+        // In case hidden
+        js.executeScript("arguments[0].style.display='block';", upload);
+
+        upload.sendKeys(filePath);
+
+        System.out.println("✅ Sender CSV file uploaded");
+
+        // ===============================
+        // 4️⃣ Wait For Livewire Processing
+        // ===============================
+        By loader = By.xpath("//div[contains(@class,'animate-pulse') or contains(@class,'animate-spin')]");
+        waitCustom.until(ExpectedConditions.invisibilityOfElementLocated(loader));
+
+        waitCustom.until(driver ->
+                js.executeScript("return document.readyState").equals("complete")
+        );
+
+        // ===============================
+        // 5️⃣ Click Yes Import (Scoped Inside Modal)
+        // ===============================
+        By importBtn = By.xpath(
+                "//div[contains(@class,'fixed')]//button[normalize-space()='Yes, Import']"
+        );
+
+        WebElement confirmBtn = waitCustom.until(
+                ExpectedConditions.visibilityOfElementLocated(importBtn)
+        );
+
+        js.executeScript("arguments[0].scrollIntoView({block:'center'});", confirmBtn);
+
+        try { Thread.sleep(400); } catch (Exception ignored) {}
+
+        js.executeScript("arguments[0].click();", confirmBtn);
+
+        System.out.println("✅ Yes, Import clicked");
+
+        // ===============================
+        // 6️⃣ Wait For Success Message
+        // ===============================
+        By successBanner = By.xpath(
+                "//*[contains(text(),'Imported') or contains(text(),'successfully')]"
+        );
+
+        waitCustom.until(ExpectedConditions.visibilityOfElementLocated(successBanner));
+
+        System.out.println("✅ Sender IDs imported successfully");
     }
 }
